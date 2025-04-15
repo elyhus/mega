@@ -112,6 +112,7 @@ async fn merge_ff(commit: Commit) {
     })
     .await;
 }
+
 #[tokio::test]
 async fn test_merge_message() {
     let args = MergeArgs {
