@@ -19,12 +19,12 @@ pub struct MergeArgs {
     /// The commit message for the merge commit
     #[arg(short,long)]
     pub message: Option<String>,
-};
+}
 
 pub async fn execute(args: MergeArgs) {
     let target_commit_hash = get_target_commit(&args.branch).await;
     let merge_message=args.message.unwrap_or_else(||{
-        format!("Merge branch '{}' into current", args.branch)}).await;
+        format!("Merge branch '{}' into current", args.branch)});
     // Get the merge commit message. 
     // And if the message is not provided, the default message is used
     if target_commit_hash.is_err() {
