@@ -19,9 +19,7 @@ pub struct MergeArgs {
     /// The commit message for the merge commit
     #[arg(short,long)]
     pub message: Option<String>,
-}
-
-
+};
 
 pub async fn execute(args: MergeArgs) {
     let target_commit_hash = get_target_commit(&args.branch).await;
