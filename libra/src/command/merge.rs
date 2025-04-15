@@ -122,6 +122,7 @@ async fn test_merge_message() {
     execute(args).await;
     assert!(true); 
 }
+
 #[tokio::test]
 async fn test_default_merge_message() {
     let args = MergeArgs {
