@@ -32,7 +32,6 @@ pub async fn execute(args: MergeArgs) {
         return;
     }
     let commit_hash = target_commit_hash.unwrap();
-
     let target_commit: Commit = load_object(&commit_hash).unwrap();
     let current_commit: Commit = load_object(&Head::current_commit().await.unwrap()).unwrap();
     let lca = lca_commit(&current_commit, &target_commit).await;
@@ -120,7 +119,11 @@ async fn test_merge_message() {
         message: Some("Custom merge message".to_string()),
     };
     execute(args).await;
-    assert!(true); 
+
+    let head_commit_hash = Head::current_commit().await.unwrap();
+    let commit: Commit = load_object(&head_commit_hash).unwrap();
+    
+    assert_eq!(commit.message, "Custom merge message");
 }
 
 #[tokio::test]
@@ -130,5 +133,10 @@ async fn test_default_merge_message() {
         message: None,
     };
     execute(args).await;
-    assert!(true);
+
+    let head_commit_hash = Head::current_commit().await.unwrap();
+    let commit: Commit = load_object(&head_commit_hash).unwrap();
+    
+    let expected = format!("Merge branch '{}' into current", args.branch);
+    assert_eq!(commit.message, expected);
 }
