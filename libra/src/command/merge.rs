@@ -17,16 +17,16 @@ pub struct MergeArgs {
     pub branch: String,
 
     /// The commit message for the merge commit
-    #[arg(short,long)]
+    #[arg(short, long)]
     pub message: Option<String>,
 }
 
 pub async fn execute(args: MergeArgs) {
     let target_commit_hash = get_target_commit(&args.branch).await;
-    let merge_message=args.message.unwrap_or_else(||{
-        format!("Merge branch '{}' into current", args.branch)});
-    // Get the merge commit message. 
-    // And if the message is not provided, the default message is used
+    let merge_message = args
++        .message
++        .unwrap_or_else(|| format!("Merge branch '{}' into current", args.branch));
++    // Get the merge commit message.
     if target_commit_hash.is_err() {
         eprintln!("{}", target_commit_hash.err().unwrap());
         return;
@@ -41,7 +41,7 @@ pub async fn execute(args: MergeArgs) {
         return;
     }
     let mut lca = lca.unwrap();
-    lca.message=merge_message;
+    lca.message = merge_message;
     if lca.id == target_commit.id {
         // no need to merge
         println!("Already up to date.");
