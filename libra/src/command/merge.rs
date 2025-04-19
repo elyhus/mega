@@ -24,7 +24,7 @@ pub async fn execute(args: MergeArgs) {
     let target_commit_hash = get_target_commit(&args.branch).await;
     let merge_message = args
         .message
-        .unwrap_or_else(|| format!("Merge branch '{}' into current", args.branch));
+        .unwrap_or_else(|| format!("Merge branch '{}' into current", &args.branch));
     // Get the merge commit message.
     if target_commit_hash.is_err() {
         eprintln!("{}", target_commit_hash.err().unwrap());
