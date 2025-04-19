@@ -15,7 +15,6 @@ use super::{
 pub struct MergeArgs {
     /// The branch to merge into the current branch, could be remote branch
     pub branch: String,
-
     /// The commit message for the merge commit
     #[arg(short, long)]
     pub message: Option<String>,
@@ -24,9 +23,9 @@ pub struct MergeArgs {
 pub async fn execute(args: MergeArgs) {
     let target_commit_hash = get_target_commit(&args.branch).await;
     let merge_message = args
-+        .message
-+        .unwrap_or_else(|| format!("Merge branch '{}' into current", args.branch));
-+    // Get the merge commit message.
+        .message
+        .unwrap_or_else(|| format!("Merge branch '{}' into current", args.branch));
+    // Get the merge commit message.
     if target_commit_hash.is_err() {
         eprintln!("{}", target_commit_hash.err().unwrap());
         return;
@@ -35,7 +34,6 @@ pub async fn execute(args: MergeArgs) {
     let target_commit: Commit = load_object(&commit_hash).unwrap();
     let current_commit: Commit = load_object(&Head::current_commit().await.unwrap()).unwrap();
     let lca = lca_commit(&current_commit, &target_commit).await;
-    
     if lca.is_none() {
         eprintln!("fatal: fatal: refusing to merge unrelated histories");
         return;
@@ -62,21 +60,17 @@ pub async fn execute(args: MergeArgs) {
 async fn lca_commit(lhs: &Commit, rhs: &Commit) -> Option<Commit> {
     let lhs_reachable = log::get_reachable_commits(lhs.id.to_string()).await;
     let rhs_reachable = log::get_reachable_commits(rhs.id.to_string()).await;
-
     // Commit `eq` is based on tree_id, so we shouldn't use it here
-
     for commit in lhs_reachable.iter() {
         if commit.id == rhs.id {
             return Some(commit.to_owned());
         }
     }
-
     for commit in rhs_reachable.iter() {
         if commit.id == lhs.id {
             return Some(commit.to_owned());
         }
     }
-
     for lhs_parent in lhs_reachable.iter() {
         for rhs_parent in rhs_reachable.iter() {
             if lhs_parent.id == rhs_parent.id {
@@ -100,7 +94,6 @@ async fn merge_ff(commit: Commit) {
             Head::update(Head::Detached(commit.id), None).await;
         }
     }
-    
     // change the working directory to the commit
     // restore all files to worktree from HEAD
     restore::execute(RestoreArgs {
@@ -119,10 +112,8 @@ async fn test_merge_message() {
         message: Some("Custom merge message".to_string()),
     };
     execute(args).await;
-
     let head_commit_hash = Head::current_commit().await.unwrap();
     let commit: Commit = load_object(&head_commit_hash).unwrap();
-    
     assert_eq!(commit.message, "Custom merge message");
 }
 
@@ -133,10 +124,8 @@ async fn test_default_merge_message() {
         message: None,
     };
     execute(args).await;
-
     let head_commit_hash = Head::current_commit().await.unwrap();
     let commit: Commit = load_object(&head_commit_hash).unwrap();
-    
     let expected = format!("Merge branch '{}' into current", args.branch);
     assert_eq!(commit.message, expected);
 }
